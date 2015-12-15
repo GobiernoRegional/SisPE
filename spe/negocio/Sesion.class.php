@@ -35,34 +35,29 @@ class Sesion extends Conexion {
     public function iniciarSesion() {
         try {
             $sql = "
-                    select 
+                     select 
                         usu_Nombre as usuario, 
-                        usu_Estado,
+                        usu_estado,
                         usu_clave, 
-                        per_Nombre as nombre,
-                        per_Apellido as apellido,
-                        car_Nombre as cargo,
-                        upe_mantenimiento as umantenimiento,
-			upe_usuario as upermiso,
-			upe_personal as upersonal,
-			upe_institucion as uinstitucion ,
-			upe_cargo as ucargo
+                        per_nombre as nombre,
+                        per_apellido as apellido,
+                        car_nombre as cargo
                     from 
                         tbusuario u
                         inner join tbpersonal p on (u.usu_per_Codigo = p.per_Codigo)
                         inner join tbcargo c on(p.per_car_Codigo = c.car_Codigo)
-                        inner join tbusuario_permiso pm on (u.usu_upe_codigo=pm.upe_codigo)
                     where 
-                        upper(usu_Nombre)= upper(:p_usuario)
+                        upper(usu_nombre)= upper(:p_usuario)
                     ";
 
+            print_r( $this->getUsuario());
             $sentecia = $this->dblink->prepare($sql);
             $sentecia->bindParam(":p_usuario", $this->getUsuario());
             $sentecia->execute();
             $resultado = $sentecia->fetch();
 
             if ($resultado["usu_clave"] == md5($this->getClave())){
-                if ($resultado["usu_Estado"] == "I"){
+                if ($resultado["usu_estado"] == "I"){
                     return 2;
                 }else{
                     session_name("sistema-spe");

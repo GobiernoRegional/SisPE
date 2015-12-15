@@ -4,8 +4,8 @@ require_once '../negocio/Sesion.class.php';
 require_once '../util/funciones/Funciones.class.php';
 
 $objSesion = new Sesion();
-$objSesion->setUsuario($_POST["txtusuario"]);
-$objSesion->setClave($_POST["txtclave"]);
+$objSesion->setUsuario('gobierno');
+$objSesion->setClave('123456');
 
 if (isset($_POST["chkrecordar"])){
     $objSesion->setRecordar("S");
@@ -14,6 +14,7 @@ if (isset($_POST["chkrecordar"])){
 }
 
 $resultado = $objSesion->iniciarSesion();
+print_r($resultado);
 switch ($resultado){
     case 1:       
         header("location:../vista/principal.php");
