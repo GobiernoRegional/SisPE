@@ -1,322 +1,338 @@
 ﻿
-CREATE TABLE tbprc_programa
+
+CREATE TABLE tbpolitica
 ( 
-	rpr_codigo           char(6)  NOT NULL ,
-	rpr_descripcion      varchar(1800)  NULL ,
-	CONSTRAINT XPKtbprc_programa PRIMARY KEY (rpr_codigo )
+	pol_codigo           char(6)  NOT NULL ,
+	pol_descripcion      char(400)  NULL ,
+	 PRIMARY KEY (pol_codigo )
 )
 ;
 
 
 
-CREATE TABLE tbprc_programaInversion
+CREATE TABLE tbestrategia
 ( 
-	rpi_codigo           char(6)  NOT NULL ,
-	rpi_uprovincia       varchar(200)  NULL ,
-	rpi_udistrito        varchar(300)  NULL ,
-	rpi_nestudio         varchar(300)  NULL ,
-	rpi_rpr_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_programaInversion PRIMARY KEY (rpi_codigo ),
-	CONSTRAINT R_37 FOREIGN KEY (rpi_rpr_codigo) REFERENCES tbprc_programa(rpr_codigo)
+	est_codigo           char(6)  NOT NULL ,
+	est_descripcion      varchar(300)  NULL ,
+	 PRIMARY KEY (est_codigo )
 )
 ;
 
 
 
-CREATE TABLE tbprc_inversionano
+CREATE TABLE tbPlanDesarrollo
 ( 
-	ria_codigo           char(6)  NOT NULL ,
-	ria_ano              integer  NULL ,
-	ria_monto            numeric(12,3)  NULL ,
-	ria_rpi_codigo       char(6)  NULL ,
-	ria_total            numeric(12,3)  NULL ,
-	CONSTRAINT XPKtbprc_inversionano PRIMARY KEY (ria_codigo ),
-	CONSTRAINT R_40 FOREIGN KEY (ria_rpi_codigo) REFERENCES tbprc_programaInversion(rpi_codigo)
+	pde_codigo           char(6)  NOT NULL ,
+	pde_titulo           varchar(500)  NULL ,
+	pde_descripcion      varchar(1000)  NULL ,
+	 PRIMARY KEY (pde_codigo )
 )
 ;
 
 
 
-CREATE TABLE tbprc_politica
+CREATE TABLE tbcapitulo
 ( 
-	rpo_codigo           char(6)  NOT NULL ,
-	rpo_descripcion      varchar(700)  NULL ,
-	CONSTRAINT XPKtbprc_politica PRIMARY KEY (rpo_codigo )
+	cap_codigo           char(6)  NOT NULL ,
+	cap_nombre           varchar(100)  NULL ,
+	cap_pdn_codigo       char(6)  NULL ,
+	 PRIMARY KEY (cap_codigo ),
+	 FOREIGN KEY (cap_pdn_codigo) REFERENCES tbPlanDesarrollo(pde_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_estrategia
+CREATE TABLE tbsubcapitulos
 ( 
-	res_codigo           char(6)  NOT NULL ,
-	res_descripcion      varchar(3000)  NULL ,
-	CONSTRAINT XPKtbprc_estrategia PRIMARY KEY (res_codigo )
+	sub_codigo           char(6)  NOT NULL ,
+	sub_nombre           varchar(100)  NULL ,
+	sub_cap_codigo       char(6)  NULL ,
+	 PRIMARY KEY (sub_codigo ),
+	 FOREIGN KEY (sub_cap_codigo) REFERENCES tbcapitulo(cap_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbPlanRegionalConcertado
+CREATE TABLE tbEjeEstrategico
 ( 
-	prc_codigo           char(6)  NOT NULL ,
-	prc_nombre           varchar(300)  NULL ,
-	prc_descripcion      varchar(400)  NULL ,
-	CONSTRAINT XPKtbPlanRegionalConcertado PRIMARY KEY (prc_codigo )
+	eje_codigo           char(6)  NOT NULL ,
+	eje_nombre           varchar(200)  NULL ,
+	eje_sub_codigo       char(6)  NULL ,
+	 PRIMARY KEY (eje_codigo ),
+	 FOREIGN KEY (eje_sub_codigo) REFERENCES tbsubcapitulos(sub_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_capitulo
+CREATE TABLE tbobjetivo_Especifico
 ( 
-	rca_codigo           char(6)  NOT NULL ,
-	rca_nombre           varchar(300)  NULL ,
-	rca_prc_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_capitulo PRIMARY KEY (rca_codigo ),
-	CONSTRAINT R_12 FOREIGN KEY (rca_prc_codigo) REFERENCES tbPlanRegionalConcertado(prc_codigo)
+	oes_codigo           char(6)  NOT NULL ,
+	oes_nombre           char(300)  NULL ,
+	oes_nej_codigo       char(6)  NULL ,
+	 PRIMARY KEY (oes_codigo ),
+	 FOREIGN KEY (oes_nej_codigo) REFERENCES tbEjeEstrategico(eje_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_subcapitulos
+CREATE TABLE tbtipo_Sector
 ( 
-	rsu_codigo           char(6)  NOT NULL ,
-	rsu_nombre           varchar(600)  NULL ,
-	rsu_rca_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_subcapitulos PRIMARY KEY (rsu_codigo ),
-	CONSTRAINT R_13 FOREIGN KEY (rsu_rca_codigo) REFERENCES tbprc_capitulo(rca_codigo)
+	tse_codigo           char(6)  NOT NULL ,
+	tse_nombre           char(300)  NULL ,
+	tse_pol_codigo       char(6)  NULL ,
+	tse_est_codigo       char(6)  NULL ,
+	tse_oes_codigo       char(6)  NULL ,
+	tse_eje_codigo       char(6)  NULL ,
+	 PRIMARY KEY (tse_codigo ),
+	 FOREIGN KEY (tse_pol_codigo) REFERENCES tbpolitica(pol_codigo),
+ FOREIGN KEY (tse_est_codigo) REFERENCES tbestrategia(est_codigo),
+ FOREIGN KEY (tse_oes_codigo) REFERENCES tbobjetivo_Especifico(oes_codigo),
+ FOREIGN KEY (tse_eje_codigo) REFERENCES tbEjeEstrategico(eje_codigo)
+)
+;
+
+CREATE TABLE tbprograma_Estrategia
+( 
+	pes_codigo           char(6)  NOT NULL ,
+	pes_tipo             varchar(50)  NULL ,
+	pes_titulo           char(18)  NULL ,
+	pes_ambito           char(18)  NULL ,
+	pes_descripcion      char(18)  NULL ,
+	pes_monto            char(18)  NULL ,
+	pes_eje_codigo       char(6)  NULL ,
+	pes_tse_codigo       char(6)  NULL ,
+	 PRIMARY KEY (pes_codigo ),
+	 FOREIGN KEY (pes_eje_codigo) REFERENCES tbEjeEstrategico(eje_codigo),
+	 FOREIGN KEY (pes_tse_codigo) REFERENCES tbtipo_Sector(tse_codigo)
+)
+;
+
+CREATE TABLE tbvariable
+( 
+	var_codigo           char(6)  NOT NULL ,
+	var_nombre           varchar(200)  NULL ,
+	var_tse_codigo       char(6)  NULL ,
+	var_justificacion    varchar(600)  NULL ,
+	var_unidadAnalisis   varchar(200)  NULL ,
+	var_ResposableGestion varchar(300)  NULL ,
+	var_responsableReporte varchar(300)  NULL ,
+	 PRIMARY KEY (var_codigo ),
+	 FOREIGN KEY (var_tse_codigo) REFERENCES tbtipo_Sector(tse_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_ejeEstrategico
+CREATE TABLE tbIndicador
 ( 
-	rej_codigo           char(6)  NOT NULL ,
-	rej_nombre           varchar(700)  NULL ,
-	rej_rsu_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_ejeEstrategico PRIMARY KEY (rej_codigo ),
-	CONSTRAINT R_14 FOREIGN KEY (rej_rsu_codigo) REFERENCES tbprc_subcapitulos(rsu_codigo)
+	ind_codigo           char(6)  NOT NULL ,
+	ind_nombre           varchar(200)  NULL ,
+	ind_umedida          varchar(100)  NULL ,
+	ind_fuente           varchar(300)  NULL ,
+	ind_rva_codigo       char(6)  NULL ,
+	ind_baseCantidad     varchar(200)  NULL ,
+	ind_baseAno          varchar(200)  NULL ,
+	ind_formula          varchar(100)  NULL ,
+	ind_tendencia        varchar(300)  NULL ,
+	ind_linea            varchar(300)  NULL ,
+	ind_noe_codigo       char(6)  NULL ,
+	ind_intencion        char(18)  NULL ,
+	ind_frecuencia       char(18)  NULL ,
+	ind_periodo          char(18)  NULL ,
+	 PRIMARY KEY (ind_codigo ),
+	 FOREIGN KEY (ind_rva_codigo) REFERENCES tbvariable(var_codigo),
+ FOREIGN KEY (ind_noe_codigo) REFERENCES tbobjetivo_Especifico(oes_codigo)
+)
+;
+
+
+CREATE TABLE tbcargo
+( 
+	car_codigo           char(6)  NOT NULL ,
+	car_nombre           varchar(100)  NULL ,
+	 PRIMARY KEY (car_codigo )
 )
 ;
 
 
 
-CREATE TABLE tbprc_objetivosEspecificos
+CREATE TABLE tbubigeo_departamento
 ( 
-	roe_codigo           char(6)  NOT NULL ,
-	roe_nombre           varchar(600)  NULL ,
-	roe_rej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_objetivosEspecificos PRIMARY KEY (roe_codigo ),
-	CONSTRAINT R_15 FOREIGN KEY (roe_rej_codigo) REFERENCES tbprc_ejeEstrategico(rej_codigo)
+	ude_codigo           char(2)  NOT NULL ,
+	ude_nombre           char(100)  NULL ,
+	 PRIMARY KEY (ude_codigo )
 )
 ;
 
 
 
-CREATE TABLE tbprc_tipoSector
+CREATE TABLE tbubigeo_provincia
 ( 
-	pts_codigo           char(6)  NOT NULL ,
-	pts_nombre           char(600)  NULL ,
-	pts_rpo_codigo       char(6)  NULL ,
-	pts_res_codigo       char(6)  NULL ,
-	pts_rpr_codigo       char(6)  NULL ,
-	pts_roe_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_tipoSector PRIMARY KEY (pts_codigo ),
-	CONSTRAINT R_19 FOREIGN KEY (pts_rpo_codigo) REFERENCES tbprc_politica(rpo_codigo),
-CONSTRAINT R_20 FOREIGN KEY (pts_res_codigo) REFERENCES tbprc_estrategia(res_codigo),
-CONSTRAINT R_21 FOREIGN KEY (pts_rpr_codigo) REFERENCES tbprc_programa(rpr_codigo),
-CONSTRAINT R_22 FOREIGN KEY (pts_roe_codigo) REFERENCES tbprc_objetivosEspecificos(roe_codigo)
+	upr_codigo           char(3)  NOT NULL ,
+	upr_nombre           char(100)  NULL ,
+	upr_ude_codigo       char(2)  NULL ,
+	 PRIMARY KEY (upr_codigo ),
+	 FOREIGN KEY (upr_ude_codigo) REFERENCES tbubigeo_departamento(ude_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_Inversion
+CREATE TABLE tbubigeo_distrito
 ( 
-	rin_codigo           char(6)  NOT NULL ,
-	rin_año              integer  NULL ,
-	rin_monto            numeric(12,3)  NULL ,
-	rin_rej_codigo       char(18)  NULL ,
-	rin_total            numeric(12,3)  NULL ,
-	rin_porcentaje       numeric(12,3)  NULL ,
-	rin_pts_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_Inversion PRIMARY KEY (rin_codigo ),
-	CONSTRAINT R_36 FOREIGN KEY (rin_pts_codigo) REFERENCES tbprc_tipoSector(pts_codigo)
+	udi_codigo           char(4)  NOT NULL ,
+	udi_nombre           char(18)  NULL ,
+	udi_upr_codigo       char(3)  NULL ,
+	 PRIMARY KEY (udi_codigo ),
+	 FOREIGN KEY (udi_upr_codigo) REFERENCES tbubigeo_provincia(upr_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_variable
+CREATE TABLE tbDependencia
 ( 
-	rva_codigo           char(6)  NOT NULL ,
-	rva_nombre           char(2000)  NULL ,
-	rva_pts_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_variable PRIMARY KEY (rva_codigo ),
-	CONSTRAINT R_23 FOREIGN KEY (rva_pts_codigo) REFERENCES tbprc_tipoSector(pts_codigo)
+	dep_codigo           char(6)  NOT NULL ,
+	dep_nombre           varchar(300)  NULL ,
+	dep_telefono         char(9)  NULL ,
+	dep_udi_codigo       char(4)  NULL ,
+	 PRIMARY KEY (dep_codigo ),
+	 FOREIGN KEY (dep_udi_codigo) REFERENCES tbubigeo_distrito(udi_codigo)
+)
+;
+
+
+CREATE TABLE tbArea
+( 
+	are_codigo           char(6)  NOT NULL ,
+	are_nombre           varchar(300)  NULL ,
+	are_dep_codigo       char(6)  NULL ,
+	 PRIMARY KEY (are_codigo ),
+	 FOREIGN KEY (are_dep_codigo) REFERENCES tbDependencia(dep_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_metas
+CREATE TABLE tbpersonal
 ( 
-	rme_codigo           char(6)  NOT NULL ,
-	rme_meta2014         numeric(12,3)  NULL ,
-	rme_meta2018         numeric(12,3)  NULL ,
-	rme_meta2021         numeric(12,3)  NULL ,
-	rme_rva_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_metas PRIMARY KEY (rme_codigo ),
-	CONSTRAINT R_34 FOREIGN KEY (rme_rva_codigo) REFERENCES tbprc_variable(rva_codigo)
+	per_codigo           char(6)  NOT NULL ,
+	per_nombre           varchar(300)  NULL ,
+	per_apellido         varchar(300)  NULL ,
+	per_dni              char(8)  NULL ,
+	per_fnac             date  NULL ,
+	per_direccion        varchar(300)  NULL ,
+	per_sexo             char(1)  NULL ,
+	per_correo           varchar(300)  NULL ,
+	per_telefono         char(9)  NULL ,
+	per_estado           char(1)  NULL ,
+	per_ind_codigo       char(6)  NULL ,
+	per_car_codigo       char(6)  NULL ,
+	per_are_codigo       char(6)  NULL ,
+	per_udi_codigo       char(4)  NULL ,
+	 PRIMARY KEY (per_codigo ),
+	 FOREIGN KEY (per_ind_codigo) REFERENCES tbIndicador(ind_codigo),
+ FOREIGN KEY (per_car_codigo) REFERENCES tbcargo(car_codigo),
+ FOREIGN KEY (per_are_codigo) REFERENCES tbArea(are_codigo),
+ FOREIGN KEY (per_udi_codigo) REFERENCES tbubigeo_distrito(udi_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_lineaBase
+
+
+CREATE TABLE tbprograma_Inversion
 ( 
-	rlb_codigo           char(6)  NOT NULL ,
-	rlb_cantidad         integer  NULL ,
-	rlb_ano              integer  NULL ,
-	rlb_rva_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_lineaBase PRIMARY KEY (rlb_codigo ),
-	CONSTRAINT R_33 FOREIGN KEY (rlb_rva_codigo) REFERENCES tbprc_variable(rva_codigo)
+	pin_codigo           char(6)  NOT NULL ,
+	pin_nestudio         varchar(200)  NULL ,
+	pin_npe_codigo       char(6)  NULL ,
+	pin_udi_codigo       char(4)  NULL ,
+	 PRIMARY KEY (pin_codigo ),
+	 FOREIGN KEY (pin_npe_codigo) REFERENCES tbprograma_Estrategia(pes_codigo),
+ FOREIGN KEY (pin_udi_codigo) REFERENCES tbubigeo_distrito(udi_codigo)
+)
+;
+
+
+CREATE TABLE tbinversion_ano
+( 
+	ian_codigo           char(6)  NOT NULL ,
+	ian_año              char(4)  NULL ,
+	ian_monto            numeric(12,3)  NULL ,
+	ian_pin_codigo       char(6)  NULL ,
+	ian_total            numeric(12,3)  NULL ,
+	 PRIMARY KEY (ian_codigo ),
+	 FOREIGN KEY (ian_pin_codigo) REFERENCES tbprograma_Inversion(pin_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbprc_Indicador
+CREATE TABLE tbInversion
 ( 
-	rin_codigo           char(600)  NOT NULL ,
-	rin_nombre           varchar(700)  NULL ,
-	rin_umedida          varchar(50)  NULL ,
-	rin_fuente           varchar(400)  NULL ,
-	rin_rva_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbprc_Indicador PRIMARY KEY (rin_codigo ),
-	CONSTRAINT R_32 FOREIGN KEY (rin_rva_codigo) REFERENCES tbprc_variable(rva_codigo)
+	inv_codigo           char(6)  NOT NULL ,
+	inv_año              char(4)  NULL ,
+	inv_monto            numeric(12,3)  NULL ,
+	inv_total            numeric(12,3)  NULL ,
+	inv_porcentaje       char(6)  NULL ,
+	inv_tse_codigo       char(6)  NULL ,
+	 PRIMARY KEY (inv_codigo ),
+	 FOREIGN KEY (inv_tse_codigo) REFERENCES tbtipo_Sector(tse_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbPlanDesarrolloNacional
+CREATE TABLE tbmeta
 ( 
-	pdn_codigo           char(6)  NOT NULL ,
-	pdn_titulo           varchar(50)  NULL ,
-	pdn_descripcion      varchar(300)  NULL ,
-	CONSTRAINT XPKtbPlanDesarrolloNacional PRIMARY KEY (pdn_codigo )
+	met_codigo           char(6)  NOT NULL ,
+	met_ano              char(4)  NULL ,
+	met_ind_codigo       char(6)  NULL ,
+	met_valor            numeric(12,3)  NULL ,
+	 PRIMARY KEY (met_codigo ),
+	 FOREIGN KEY (met_ind_codigo) REFERENCES tbIndicador(ind_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbpdn_EjeEstrategico
+CREATE TABLE tbaccion
 ( 
-	nej_codigo           char(6)  NOT NULL ,
-	nej_nombre           varchar(100)  NULL ,
-	nej_pdn_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_EjeEstrategico PRIMARY KEY (nej_codigo ),
-	CONSTRAINT R_11 FOREIGN KEY (nej_pdn_codigo) REFERENCES tbPlanDesarrolloNacional(pdn_codigo)
+	acc_codigo           char(6)  NOT NULL ,
+	acc_descripcion      char(400)  NULL ,
+	acc_obj_codigo       char(6)  NULL ,
+	 PRIMARY KEY (acc_codigo ),
+	 FOREIGN KEY (acc_obj_codigo) REFERENCES tbobjetivo_Especifico(oes_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbpdn_ProgramasEstrategicos
+CREATE TABLE tbprioridad
 ( 
-	npe_codigo           char(6)  NOT NULL ,
-	npe_tipo             varchar(200)  NULL ,
-	npe_titulo           varchar(100)  NULL ,
-	npe_ambito           varchar(200)  NULL ,
-	npe_descripcion      varchar(200)  NULL ,
-	npe_monto            numeric(12,3)  NULL ,
-	npe_nej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_ProgramasEstrategicos PRIMARY KEY (npe_codigo ),
-	CONSTRAINT R_10 FOREIGN KEY (npe_nej_codigo) REFERENCES tbpdn_EjeEstrategico(nej_codigo)
-);
-
-
-
-CREATE TABLE tbpdn_objetivosEspecificos
-( 
-	noe_codigo           char(6)  NOT NULL ,
-	noe_nombre           varchar(200)  NULL ,
-	noe_nej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_objetivosEspecificos PRIMARY KEY (noe_codigo ),
-	CONSTRAINT R_8 FOREIGN KEY (noe_nej_codigo) REFERENCES tbpdn_EjeEstrategico(nej_codigo)
+	pri_codigo           char(6)  NOT NULL ,
+	pri_nombre           char(300)  NULL ,
+	pri_eje_codigo       char(6)  NULL ,
+	 PRIMARY KEY (pri_codigo ),
+	 FOREIGN KEY (pri_eje_codigo) REFERENCES tbEjeEstrategico(eje_codigo)
 )
 ;
 
 
 
-CREATE TABLE tbpdn_acciones
+CREATE TABLE tbObjetivo_Nacional
 ( 
-	nac_codigo           char(6)  NOT NULL ,
-	nac_descripcion      char(200)  NULL ,
-	nac_noe_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_acciones PRIMARY KEY (nac_codigo ),
-	CONSTRAINT R_9 FOREIGN KEY (nac_noe_codigo) REFERENCES tbpdn_objetivosEspecificos(noe_codigo)
+	ona_codigo           char(6)  NOT NULL ,
+	ona_nombre           char(100)  NULL ,
+	ona_descripcion      char(300)  NULL ,
+	ona_eje_codigo       char(6)  NULL ,
+	 PRIMARY KEY (ona_codigo ),
+	 FOREIGN KEY (ona_eje_codigo) REFERENCES tbEjeEstrategico(eje_codigo)
 )
 ;
-
-
-
-CREATE TABLE tbpdn_OEIndicadores
-( 
-	noi_codigo           char(18)  NOT NULL ,
-	noi_nombre           char(200)  NULL ,
-	noi_umedida          char(50)  NULL ,
-	noi_noe_codigo       char(6)  NULL ,
-	noi_formula          char(100)  NULL ,
-	noi_fuente           char(100)  NULL ,
-	noi_linea            char(100)  NULL ,
-	noi_tendencia        char(100)  NULL ,
-	noi_metas            char(100)  NULL ,
-	CONSTRAINT XPKtbpdn_OEIndicadores PRIMARY KEY (noi_codigo ),
-	CONSTRAINT R_6 FOREIGN KEY (noi_noe_codigo) REFERENCES tbpdn_objetivosEspecificos(noe_codigo)
-)
-;
-
-
-
-CREATE TABLE tbpdn_prioridades
-( 
-	npr_codigo           char(6)  NOT NULL ,
-	npr_nombre           varchar(200)  NULL ,
-	npr_nej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_prioridades PRIMARY KEY (npr_codigo ),
-	CONSTRAINT R_5 FOREIGN KEY (npr_nej_codigo) REFERENCES tbpdn_EjeEstrategico(nej_codigo)
-)
-;
-
-
-
-CREATE TABLE tbpdn_lineamiento
-( 
-	nli_codigo           char(6)  NOT NULL ,
-	nli_tipo             varchar(100)  NULL ,
-	nli_descripcion      char(300)  NULL ,
-	nli_nej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_lineamiento PRIMARY KEY (nli_codigo ),
-	CONSTRAINT R_4 FOREIGN KEY (nli_nej_codigo) REFERENCES tbpdn_EjeEstrategico(nej_codigo)
-)
-;
-
-
-
-CREATE TABLE tbpdn_ObjetivoNacional
-( 
-	non_codigo           char(6)  NOT NULL ,
-	non_nombre           varchar(200)  NULL ,
-	non_descripcion      varchar(300)  NULL ,
-	non_nej_codigo       char(6)  NULL ,
-	CONSTRAINT XPKtbpdn_ObjetivoNacional PRIMARY KEY (non_codigo ),
-	CONSTRAINT R_3 FOREIGN KEY (non_nej_codigo) REFERENCES tbpdn_EjeEstrategico(nej_codigo)
-)
-;
-
 
